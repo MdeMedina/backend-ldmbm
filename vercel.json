@@ -15,31 +15,6 @@
     "env": {
       "NODE_ENV": "production",
       "PORT": "3000"
-    },
-    "functions": {
-      "api/**/*.js": {
-        "memory": 1024,
-        "maxDuration": 10
-      }
-    },
-    "headers": [
-      {
-        "source": "/(.*)",
-        "headers": [
-          {
-            "key": "Access-Control-Allow-Origin",
-            "value": "*"
-          },
-          {
-            "key": "Access-Control-Allow-Methods",
-            "value": "GET, POST, PUT, DELETE, OPTIONS"
-          },
-          {
-            "key": "Access-Control-Allow-Headers",
-            "value": "Content-Type, Authorization"
-          }
-        ]
-      }
-    ]
+    }
   }
   
