@@ -16,7 +16,7 @@ const createTrans = () => {
 
 function getFileByFilename(filename) {
   console.log(filename);
-  const filePath = path.join(__dirname, "../app/uploads", filename);
+const filePath = path.join("/tmp", "uploads", filename);
   console.log("filepath:", filePath)
   try {
     const file = fs.readFileSync(filePath);
