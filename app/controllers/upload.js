@@ -2,8 +2,10 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-// Asegurarse de que la carpeta 'uploads' exista
-const uploadDir = path.join(__dirname, "../uploads");
+// Cambiar la carpeta de almacenamiento a /tmp/uploads
+const uploadDir = path.join("/tmp", "uploads");
+
+// Asegurarse de que el directorio exista
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
@@ -11,7 +13,7 @@ if (!fs.existsSync(uploadDir)) {
 // Configuración de almacenamiento para multer
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, uploadDir); // Ruta asegurada
+    cb(null, uploadDir); // Ruta asegurada en /tmp/uploads
   },
   filename: function (req, file, cb) {
     // Reemplazar caracteres especiales en el nombre del archivo

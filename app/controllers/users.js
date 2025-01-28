@@ -77,29 +77,6 @@ const loginUser = async (req, res) => {
     } else {
       const isMatch = await bcrypt.compare(body.password, user.password);
       if (isMatch) {
-        if (user.permissions.obviarIngreso === false) {
-          let ahora_mismo = await horaActual();
-          let check = await checkearTime(ahora_mismo);
-          if (check.malaHora == true) {
-            res.status(401).json({
-              errormessage: `No se puede ingresar, el sitio abre de nuevo a las ${check.apertura}, por favor intentelo de nuevo a esa hora`,
-            });
-          } else {
-            console.log(user.vendedor);
-            const signed = signToken(user._id);
-            res.status(200).json({
-              message:
-                "El usuario a ingresado correctamente, sera redirigido a la pagina de inicio",
-              key: signed,
-              vendedor: user.vendedor,
-              name: user.username,
-              permissions: user.permissions,
-              email: user.email,
-              cantidadM: user.cantidadM,
-              messageId: user.messageId,
-            });
-          }
-        } else {
           const signed = signToken(user._id);
           res.status(200).json({
             message:
@@ -112,7 +89,6 @@ const loginUser = async (req, res) => {
             cantidadM: user.cantidadM,
             messageId: user.messageId,
           });
-        }
       } else {
         res
           .status(403)
