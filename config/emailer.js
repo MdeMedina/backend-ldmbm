@@ -4,6 +4,8 @@ const fs = require("fs");
 const { google } = require("googleapis");
 const { authenticate } = require("./auth"); // Asegúrate de tener autenticación configurada
 
+const uploadDir = path.join("/tmp", "uploads");
+
 const createTrans = () => {
   const transport = nodemailer.createTransport({
     host: "smtp.hostinger.com",
