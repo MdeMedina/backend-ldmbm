@@ -51,16 +51,17 @@ const sendMail = async (filename, correo, nota, corr, nCliente) => {
     ],
   };
   // Envía el correo electrónico
-  transporter.sendMail(mailOptions, (error, info) => {
+  let prueba = transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
-      let def = { str: "Error al enviar el correo:", info: error };
+      console.log("error", error)
       return def;
     } else {
-      let def = { str: "Correo electrónico enviado:", info: info.response };
+      console.log("info: ", info.response)
       return def;
     }
   });
 
+  console.log("aqui, en la prueba", prueba)
   // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
 
   //
