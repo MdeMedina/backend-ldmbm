@@ -2,6 +2,8 @@ const nodemailer = require("nodemailer");
 const path = require("path");
 const fs = require("fs");
 
+const uploadDir = path.join("/tmp", "uploads");
+
 const createTrans = () => {
   const transport = nodemailer.createTransport({
     host: "smtp.hostinger.com",
