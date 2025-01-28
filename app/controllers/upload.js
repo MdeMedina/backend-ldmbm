@@ -27,11 +27,16 @@ const upload = multer({ storage: storage });
 // Función para obtener un archivo por nombre de archivo
 function getFileByFilename(filename) {
   const filePath = path.join(uploadDir, filename);
-  try {
-    const file = fs.readFileSync(filePath);
-    return file;
-  } catch (error) {
-    console.error("Error al leer el archivo:", error.message);
+  if (fs.existsSync(filePath)) {
+    try {
+      const file = fs.readFileSync(filePath);
+      return file;
+    } catch (error) {
+      console.error("Error al leer el archivo:", error.message);
+      return null;
+    }
+  } else {
+    console.error("El archivo no existe:", filePath);
     return null;
   }
 }
@@ -44,12 +49,17 @@ exports.getFileByFilename = (filename) => {
 exports.upload = upload.single("myFile");
 
 exports.uploadFile = (req, res) => {
-  // Verificar si el archivo fue recibido correctamente
   if (req.file) {
-    console.log("Archivo recibido:", req.file);
-    res.send({ data: req.file.filename });
+    const uploadedFilePath = path.join(uploadDir, req.file.filename);
+    if (fs.existsSync(uploadedFilePath)) {
+      console.log("Archivo subido exitosamente:", uploadedFilePath);
+      res.send({ data: req.file.filename });
+    } else {
+      console.error("Error: El archivo no se encuentra después de la subida.");
+      res.status(500).send({ error: "Error al procesar el archivo." });
+    }
   } else {
-    console.error("No se recibió ningún archivo");
+    console.error("No se recibió ningún archivo.");
     res.status(400).send({ error: "No se pudo subir el archivo." });
   }
 };
