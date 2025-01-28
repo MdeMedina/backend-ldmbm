@@ -15,16 +15,21 @@ const createTrans = () => {
 };
 
 function getFileByFilename(filename) {
-  console.log(filename);
-const filePath = path.join("/tmp", "uploads", filename);
-  console.log("filepath:", filePath)
-  try {
-    const file = fs.readFileSync(filePath);
-    return file;
-  } catch (error) {
-    return error;
+  const filePath = path.join(uploadDir, filename);
+  if (fs.existsSync(filePath)) {
+    try {
+      const file = fs.readFileSync(filePath);
+      return file;
+    } catch (error) {
+      console.error("Error al leer el archivo:", error.message);
+      return null;
+    }
+  } else {
+    console.error("El archivo no existe:", filePath);
+    return null;
   }
 }
+
 
 const sendMail = async (filename, correo, nota, corr, nCliente) => {
   console.log("corr", corr)
