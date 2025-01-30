@@ -101,3 +101,4 @@ docker-compose.override.yml
 # Local overrides
 local.env
 *.local
+.vercel
