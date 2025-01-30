@@ -1,55 +1,60 @@
-const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
+const { google } = require("googleapis");
+const { Readable } = require("stream");
+const mime = require("mime-types");
 
-// Cambiar la carpeta de almacenamiento a /tmp/uploads
-const uploadDir = path.join("/tmp", "uploads");
 
-// Asegurarse de que el directorio exista
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-// Configuración de almacenamiento para multer
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadDir); // Ruta asegurada en /tmp/uploads
-  },
-  filename: function (req, file, cb) {
-    // Reemplazar caracteres especiales en el nombre del archivo
-    const sanitizedFilename = file.originalname.replace(/[^a-zA-Z0-9._-]/g, "_");
-    cb(null, sanitizedFilename);
-  },
+const SCOPES = ["https://www.googleapis.com/auth/drive.file"];
+const auth = new google.auth.GoogleAuth({
+  keyFile: "./credentials.json",
+  scopes: SCOPES,
 });
+const drive = google.drive({ version: "v3", auth });
 
-const upload = multer({ storage: storage });
+async function uploadFile(fileBase64, fileName, folderId = null) {
+  console.log("Entre en uF");
+  
+  // Decodificar el archivo base64
+  const buffer = Buffer.from(fileBase64, 'base64');
+  
+  // Obtener el tipo MIME del archivo
+  const mimeType = mime.lookup(fileName) || "application/octet-stream";
+  const stream = Readable.from(buffer);
 
-// Función para obtener un archivo por nombre de archivo
-function getFileByFilename(filename) {
-  const filePath = path.join(uploadDir, filename);
   try {
-    const file = fs.readFileSync(filePath);
-    return file;
+    // Buscar si el archivo ya existe
+    const existingFiles = await drive.files.list({
+      q: `name='${fileName}' and '${folderId || "root"}' in parents and trashed=false`,
+      fields: "files(id)"
+    });
+console.log("archivo, existente",existingFiles.data.files);
+
+    if (existingFiles.data.files.length > 0) {
+      const fileId = existingFiles.data.files[0].id;
+      console.log(`Archivo existente encontrado: ${fileId}, reemplazando...`);
+      
+      // Reemplazar el archivo existente
+      await drive.files.update({
+        fileId,
+        media: { mimeType, body: stream },
+      });
+      console.log("Archivo reemplazado exitosamente.");
+    } else {
+      console.log("No se encontró el archivo, subiendo uno nuevo...");
+      
+      // Subir un nuevo archivo
+      await drive.files.create({
+        requestBody: {
+          name: fileName,
+          parents: folderId ? [folderId] : [],
+        },
+        media: { mimeType, body: stream },
+      });
+      console.log("Archivo subido exitosamente.");
+    }
   } catch (error) {
-    console.error("Error al leer el archivo:", error.message);
-    return null;
+    console.error("Error al subir el archivo:", error);
   }
+  
 }
 
-// Exportar funciones
-exports.getFileByFilename = (filename) => {
-  return getFileByFilename(filename);
-};
-
-exports.upload = upload.single("myFile");
-
-exports.uploadFile = (req, res) => {
-  // Verificar si el archivo fue recibido correctamente
-  if (req.file) {
-    console.log("Archivo recibido:", req.file);
-    res.send({ data: req.file.filename });
-  } else {
-    console.error("No se recibió ningún archivo");
-    res.status(400).send({ error: "No se pudo subir el archivo." });
-  }
-};
+module.exports = { uploadFile };
