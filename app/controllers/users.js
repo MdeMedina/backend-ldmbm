@@ -69,7 +69,7 @@ const actNotificaciones = async (req, res) => {
 const loginUser = async (req, res) => {
   const { body } = req;
   try {
-    const user = await User.findOne({ email: body.email });
+    const user = await User.findOne({ email: body.email.toLowerCase() });
     if (!user) {
       res
         .status(403)
@@ -84,7 +84,6 @@ const loginUser = async (req, res) => {
             key: signed,
             name: user.username,
             vendedor: user.vendedor,
-            permissions: user.permissions,
             email: user.email,
             cantidadM: user.cantidadM,
             messageId: user.messageId,
@@ -109,7 +108,7 @@ const getUsers = async (req, res) => {
 const registerUser = async (req, res) => {
   const { body } = req;
   try {
-    const isUser = await User.findOne({ email: body.email });
+    const isUser = await User.findOne({ email: body.email.toLowerCase() });
     const users = await User.find({});
     if (isUser) {
       return res.status(403).send("usuario ya existe");
@@ -117,11 +116,10 @@ const registerUser = async (req, res) => {
     const salt = await bcrypt.genSalt();
     const hashed = await bcrypt.hash(body.password, salt);
     const user = await User.create({
-      email: body.email,
+      email: body.email.toLowerCase(),
       password: hashed,
       salt,
       username: body.username,
-      permissions: body.permissions,
       cantidadM: 10,
       messageId: users.length + 1,
       notificaciones: [],
@@ -142,7 +140,6 @@ const actUser = async (req, res) => {
     {
       email: body.email,
       username: body.username,
-      permissions: body.permissions,
       vendedor: body.vendedor,
     }
   );
