@@ -10,17 +10,19 @@ const addClient = async (req, res) => {
     } else {
       const client = await Cliente.create({
           nombre: body.nombre,
-          RUT: body.RUT,
+          RUT: body.RUT? body.RUT : "",
           correo: body.correo ? body.correo : "",
           direccion: body.direccion ?  body.direccion : "",
           contacto: body.contacto ? body.contacto : "",
           visita: body.visita ? body.visita : "",
           Observaciones: body.observacion? body.observacion : "",
+          giro: body.giro ? body.giro : "",
+          tipo: body.tipo
       });
       res.status(201).send({status: 201, client});
     }
   } catch (e) {
-    httpError(res, e);
+    res.send(e);
   }
 };
 
@@ -38,6 +40,8 @@ const editClient = async (req, res) => {
           contacto: body.contacto ? body.contacto : "",
           visita: body.visita ? body.visita : "",
           Observaciones: body.observacion? body.observacion : "",
+          giro: body.giro ? body.giro : "",
+          tipo: body.tipo
     }
   );
   body.Observaciones = body.observacion
@@ -107,7 +111,8 @@ const getClient = async (req, res) => {
       res.status(404).send({status: 404, text: "Cliente no existente"})
     }
   } catch (e) {
-    httpError(res, e);
+    console.log(e);
+    res.send(e);
   }
 }
 

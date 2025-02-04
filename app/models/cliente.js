@@ -1,13 +1,15 @@
 const mongoose = require("mongoose");
 
 const schema = new mongoose.Schema({
-    nombre: { type: String, required: true },
-  RUT: { type: String, required: true },
+  nombre: { type: String, required: true },
+  RUT: { type: String},
+  tipo: { type: String, required: true },
   correo: { type: String },
-  direccion: { type: String, required: true },
-  contacto: { type: String, required: true },
+  direccion: { type: String},
+  contacto: { type: String},
   visita: { type: String },
   Observaciones: { type: String },
+  giro: { type: String },
     // otros campos...
 });
 
